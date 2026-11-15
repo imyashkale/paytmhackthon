@@ -1,0 +1,75 @@
+AI TEAMMATES - TOP 5 BUSINESS USE CASES
+=======================================
+
+AI Teammates gives AI agents permission to take real actions in your CRM,
+billing, ticketing, calendar, knowledge base and messaging tools, within
+set limits.
+
+
+1. INSTANT REFUNDS AND PAYMENT DISPUTES
+---------------------------------------
+Problem:        Customers wait days for a refund or a failed-transaction
+                reversal. Support agents spend most of their time checking
+                orders against policy and doing the same steps again and again.
+What changes:   The AI checks the order, checks the refund policy, issues the
+                refund, updates the ticket and tells the customer, all in
+                minutes. Refunds above a set amount (Rs 5,000 by default)
+                still go to a human for approval.
+Business value: Faster refunds mean fewer complaints, fewer chargebacks and
+                less customer churn. It also means fewer support staff are
+                needed for routine cases.
+
+
+2. FOLLOWING UP EVERY SALES LEAD RIGHT AWAY
+-------------------------------------------
+Problem:        Leads (for example, merchants signing up for payment devices,
+                payment gateway or loans) go cold because no one follows up
+                for hours or days.
+What changes:   When a lead arrives, the AI looks it up in the CRM, scores it,
+                books a meeting with a sales rep and sends a follow-up,
+                without anyone stepping in.
+Business value: More leads become customers, sales reps spend their time only
+                on good leads, and no lead is missed.
+
+
+3. HANDLING ROUTINE SUPPORT QUESTIONS AUTOMATICALLY
+---------------------------------------------------
+Problem:        Most tickets are repeat questions: "Where's my money?",
+                "Why was I charged?", "How do I raise my limit?"
+What changes:   The AI reads the policy and pricing documents, answers the
+                customer, resolves the ticket, and sends only the unusual
+                cases to a person.
+Business value: Cheaper support per ticket, round-the-clock coverage without
+                adding staff, and the same answer every time.
+
+
+4. KEEPING CUSTOMERS THROUGH BILLING GOODWILL
+---------------------------------------------
+Problem:        Customers who were overcharged or hit by a failed transaction
+                leave quietly. Giving them a goodwill credit takes several
+                layers of manual approval.
+What changes:   The AI spots the billing problem, applies a credit within
+                approved limits, and confirms by SMS, email or Slack.
+Business value: You fix the problem before the customer leaves, protect
+                revenue, and spend less on refunds in bulk because each credit
+                is targeted.
+
+
+5. SAFE AUTOMATION WITH CLEAR OVERSIGHT
+---------------------------------------
+Problem:        Leadership wants AI to save money but won't let it touch money
+                or customer data without controls.
+What changes:   Every action is logged, risky actions need human approval, and
+                access is controlled. A status dashboard shows the health of
+                every connected system.
+Business value: Risk and compliance teams can approve AI use more easily
+                (important for a regulated payments company), and it's clear
+                who did what. The same setup can then be extended to other
+                teams like collections, KYC and merchant onboarding without
+                starting over.
+
+
+ONE-LINE PITCH
+--------------
+AI Teammates turn hours of manual sales and support work into minutes of
+automated, rule-bound action, with humans approving only the high-stakes cases.
