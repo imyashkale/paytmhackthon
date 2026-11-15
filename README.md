@@ -32,8 +32,15 @@ make docker-build-all                                          # all images
 make k8s-deploy                                                # deploy all to Kubernetes (namespace mcp)
 make k8s-token                                                 # bearer token for /mcp
 kubectl -n mcp port-forward svc/mcp-crm 8080:80                # reach a server locally
+make k8s-dashboard                                             # status dashboard → http://localhost:8090
 go test ./...                                                  # tests
 ```
+
+### Status dashboard
+
+- `monitor/` (Go) checks every server's health and tools and serves `GET /api/status`.
+- `frontend/` (Vue) shows it. Its image runs nginx, which forwards `/api` to `MONITOR_URL` (default `http://mcp-monitor`).
+- Local dev: `make frontend-dev` runs the frontend with hot reload at http://localhost:5173, using live data from the cluster.
 
 | Env | Purpose |
 |-----|---------|

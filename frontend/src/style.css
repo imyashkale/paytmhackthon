@@ -1,0 +1,68 @@
+:root {
+  --paper: #EEF1F5;
+  --surface: #FFFFFF;
+  --ink: #16233B;
+  --ink-soft: #56637A;
+  --rule: #D3DAE4;
+  --up: #1E8A5A;
+  --slow: #B7791F;
+  --down: #C23A2E;
+  --focus: #2C47D1;
+  --idle: #C9D1DC;
+
+  --sans: "Schibsted Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+  /* Type scale: 1.25 ratio from a 16px base. */
+  --t-sm: 0.8125rem;
+  --t-base: 1rem;
+  --t-md: 1.25rem;
+  --t-hero: clamp(2.25rem, 1.4rem + 3.6vw, 4.25rem);
+
+  --gutter: clamp(1rem, 4vw, 3rem);
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #101826;
+    --surface: #172133;
+    --ink: #E6EBF2;
+    --ink-soft: #9AA7BB;
+    --rule: #2A374D;
+    --up: #3DB57F;
+    --slow: #E0A63E;
+    --down: #F06A5C;
+    --focus: #8DA2FF;
+    --idle: #34425A;
+    color-scheme: dark;
+  }
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font: 400 var(--t-base)/1.5 var(--sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* Heartbeat ticks are shared by the legend and every system row. */
+.tick {
+  display: inline-block;
+  flex: 0 0 4px;
+  width: 4px;
+  border-radius: 1px;
+  background: var(--idle);
+}
+.tick.ok { background: var(--up); }
+.tick.slow { background: var(--slow); }
+.tick.fail { background: var(--down); }

@@ -2,3 +2,5 @@
 .claude
 *.pdf
 k8s
+**/node_modules
+frontend
