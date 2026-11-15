@@ -1,0 +1,470 @@
+# MCP servers. Image tag IMAGE_TAG is replaced by `make k8s-deploy`.
+# Token: secret mcp-token (key: token), created by `make k8s-deploy` if missing.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: mcp
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mcp-crm
+  namespace: mcp
+  labels:
+    app: mcp-crm
+    app.kubernetes.io/part-of: mcp-servers
+spec:
+  # 1 replica: state is in-memory until real backends are connected.
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mcp-crm
+  template:
+    metadata:
+      labels:
+        app: mcp-crm
+        app.kubernetes.io/part-of: mcp-servers
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: server
+          image: mcp-crm:IMAGE_TAG
+          imagePullPolicy: Never
+          ports:
+            - name: http
+              containerPort: 8080
+          env:
+            - name: PORT
+              value: "8080"
+            - name: MCP_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: mcp-token
+                  key: token
+          resources:
+            requests:
+              cpu: 25m
+              memory: 32Mi
+            limits:
+              cpu: 250m
+              memory: 128Mi
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 15
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mcp-crm
+  namespace: mcp
+  labels:
+    app.kubernetes.io/part-of: mcp-servers
+spec:
+  selector:
+    app: mcp-crm
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mcp-ticketing
+  namespace: mcp
+  labels:
+    app: mcp-ticketing
+    app.kubernetes.io/part-of: mcp-servers
+spec:
+  # 1 replica: state is in-memory until real backends are connected.
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mcp-ticketing
+  template:
+    metadata:
+      labels:
+        app: mcp-ticketing
+        app.kubernetes.io/part-of: mcp-servers
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: server
+          image: mcp-ticketing:IMAGE_TAG
+          imagePullPolicy: Never
+          ports:
+            - name: http
+              containerPort: 8080
+          env:
+            - name: PORT
+              value: "8080"
+            - name: MCP_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: mcp-token
+                  key: token
+          resources:
+            requests:
+              cpu: 25m
+              memory: 32Mi
+            limits:
+              cpu: 250m
+              memory: 128Mi
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 15
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mcp-ticketing
+  namespace: mcp
+  labels:
+    app.kubernetes.io/part-of: mcp-servers
+spec:
+  selector:
+    app: mcp-ticketing
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mcp-billing
+  namespace: mcp
+  labels:
+    app: mcp-billing
+    app.kubernetes.io/part-of: mcp-servers
+spec:
+  # 1 replica: state is in-memory until real backends are connected.
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mcp-billing
+  template:
+    metadata:
+      labels:
+        app: mcp-billing
+        app.kubernetes.io/part-of: mcp-servers
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: server
+          image: mcp-billing:IMAGE_TAG
+          imagePullPolicy: Never
+          ports:
+            - name: http
+              containerPort: 8080
+          env:
+            - name: PORT
+              value: "8080"
+            - name: MCP_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: mcp-token
+                  key: token
+            - name: REFUND_APPROVAL_LIMIT_PAISE
+              value: "500000"
+          resources:
+            requests:
+              cpu: 25m
+              memory: 32Mi
+            limits:
+              cpu: 250m
+              memory: 128Mi
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 15
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mcp-billing
+  namespace: mcp
+  labels:
+    app.kubernetes.io/part-of: mcp-servers
+spec:
+  selector:
+    app: mcp-billing
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mcp-calendar
+  namespace: mcp
+  labels:
+    app: mcp-calendar
+    app.kubernetes.io/part-of: mcp-servers
+spec:
+  # 1 replica: state is in-memory until real backends are connected.
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mcp-calendar
+  template:
+    metadata:
+      labels:
+        app: mcp-calendar
+        app.kubernetes.io/part-of: mcp-servers
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: server
+          image: mcp-calendar:IMAGE_TAG
+          imagePullPolicy: Never
+          ports:
+            - name: http
+              containerPort: 8080
+          env:
+            - name: PORT
+              value: "8080"
+            - name: MCP_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: mcp-token
+                  key: token
+          resources:
+            requests:
+              cpu: 25m
+              memory: 32Mi
+            limits:
+              cpu: 250m
+              memory: 128Mi
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 15
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mcp-calendar
+  namespace: mcp
+  labels:
+    app.kubernetes.io/part-of: mcp-servers
+spec:
+  selector:
+    app: mcp-calendar
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mcp-knowledge
+  namespace: mcp
+  labels:
+    app: mcp-knowledge
+    app.kubernetes.io/part-of: mcp-servers
+spec:
+  # 1 replica: state is in-memory until real backends are connected.
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mcp-knowledge
+  template:
+    metadata:
+      labels:
+        app: mcp-knowledge
+        app.kubernetes.io/part-of: mcp-servers
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: server
+          image: mcp-knowledge:IMAGE_TAG
+          imagePullPolicy: Never
+          ports:
+            - name: http
+              containerPort: 8080
+          env:
+            - name: PORT
+              value: "8080"
+            - name: MCP_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: mcp-token
+                  key: token
+          resources:
+            requests:
+              cpu: 25m
+              memory: 32Mi
+            limits:
+              cpu: 250m
+              memory: 128Mi
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 15
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mcp-knowledge
+  namespace: mcp
+  labels:
+    app.kubernetes.io/part-of: mcp-servers
+spec:
+  selector:
+    app: mcp-knowledge
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mcp-notifications
+  namespace: mcp
+  labels:
+    app: mcp-notifications
+    app.kubernetes.io/part-of: mcp-servers
+spec:
+  # 1 replica: state is in-memory until real backends are connected.
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mcp-notifications
+  template:
+    metadata:
+      labels:
+        app: mcp-notifications
+        app.kubernetes.io/part-of: mcp-servers
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: server
+          image: mcp-notifications:IMAGE_TAG
+          imagePullPolicy: Never
+          ports:
+            - name: http
+              containerPort: 8080
+          env:
+            - name: PORT
+              value: "8080"
+            - name: MCP_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: mcp-token
+                  key: token
+          resources:
+            requests:
+              cpu: 25m
+              memory: 32Mi
+            limits:
+              cpu: 250m
+              memory: 128Mi
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 15
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mcp-notifications
+  namespace: mcp
+  labels:
+    app.kubernetes.io/part-of: mcp-servers
+spec:
+  selector:
+    app: mcp-notifications
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
