@@ -1,0 +1,32 @@
+# Local-only helper: imports `docker save` tarballs into the node's containerd,
+# because Docker Desktop's kind-based Kubernetes doesn't share the Docker
+# image store. Used by `make k8s-load`; deleted afterwards.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: image-loader
+  namespace: kube-system
+spec:
+  restartPolicy: Never
+  tolerations:
+    - operator: Exists
+  containers:
+    - name: loader
+      image: debian:trixie-slim
+      command: ["sleep", "600"]
+      securityContext:
+        privileged: true
+      volumeMounts:
+        - name: containerd-sock
+          mountPath: /run/containerd/containerd.sock
+        - name: ctr
+          mountPath: /ctr
+  volumes:
+    - name: containerd-sock
+      hostPath:
+        path: /run/containerd/containerd.sock
+        type: Socket
+    - name: ctr
+      hostPath:
+        path: /usr/local/bin/ctr
+        type: File

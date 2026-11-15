@@ -29,6 +29,9 @@ Each server is hosted over Streamable HTTP at `POST /mcp`, with `GET /healthz`.
 PORT=8080 MCP_TOKEN=secret go run ./servers/crm/cmd/server     # local
 make docker-build SERVER=crm                                   # image → mcp-crm:<git-sha>
 make docker-build-all                                          # all images
+make k8s-deploy                                                # deploy all to Kubernetes (namespace mcp)
+make k8s-token                                                 # bearer token for /mcp
+kubectl -n mcp port-forward svc/mcp-crm 8080:80                # reach a server locally
 go test ./...                                                  # tests
 ```
 
