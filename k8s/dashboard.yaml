@@ -1,0 +1,170 @@
+# Monitoring backend (mcp-monitor) and dashboard frontend (mcp-frontend).
+# Image tag IMAGE_TAG is replaced by `make k8s-deploy`.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mcp-monitor
+  namespace: mcp
+  labels:
+    app: mcp-monitor
+    app.kubernetes.io/part-of: mcp-servers
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mcp-monitor
+  template:
+    metadata:
+      labels:
+        app: mcp-monitor
+        app.kubernetes.io/part-of: mcp-servers
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: monitor
+          image: mcp-monitor:IMAGE_TAG
+          imagePullPolicy: Never
+          ports:
+            - name: http
+              containerPort: 8080
+          env:
+            - name: PORT
+              value: "8080"
+            - name: POLL_INTERVAL
+              value: "5s"
+            - name: MCP_SERVERS
+              value: >-
+                crm=http://mcp-crm/mcp,
+                ticketing=http://mcp-ticketing/mcp,
+                billing=http://mcp-billing/mcp,
+                calendar=http://mcp-calendar/mcp,
+                knowledge=http://mcp-knowledge/mcp,
+                notifications=http://mcp-notifications/mcp
+            - name: MCP_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: mcp-token
+                  key: token
+          resources:
+            requests:
+              cpu: 25m
+              memory: 32Mi
+            limits:
+              cpu: 250m
+              memory: 128Mi
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 15
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mcp-monitor
+  namespace: mcp
+  labels:
+    app.kubernetes.io/part-of: mcp-servers
+spec:
+  selector:
+    app: mcp-monitor
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mcp-frontend
+  namespace: mcp
+  labels:
+    app: mcp-frontend
+    app.kubernetes.io/part-of: mcp-servers
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mcp-frontend
+  template:
+    metadata:
+      labels:
+        app: mcp-frontend
+        app.kubernetes.io/part-of: mcp-servers
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: frontend
+          image: mcp-frontend:IMAGE_TAG
+          imagePullPolicy: Never
+          ports:
+            - name: http
+              containerPort: 8080
+          env:
+            # nginx forwards /api/* here. Matches the mcp-monitor Service above.
+            - name: MONITOR_URL
+              value: http://mcp-monitor
+          resources:
+            requests:
+              cpu: 10m
+              memory: 16Mi
+            limits:
+              cpu: 200m
+              memory: 64Mi
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 15
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          volumeMounts:
+            # nginx writes its rendered config, pid file and temp files here.
+            - name: conf
+              mountPath: /etc/nginx/conf.d
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: conf
+          emptyDir: {}
+        - name: tmp
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mcp-frontend
+  namespace: mcp
+  labels:
+    app.kubernetes.io/part-of: mcp-servers
+spec:
+  selector:
+    app: mcp-frontend
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
