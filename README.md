@@ -21,6 +21,25 @@ Agent (Claude, etc.) → MCP Client → Golang MCP Servers → CRM · Billing ·
 | Knowledge     | Query docs, policies, pricing             |
 | Notifications | Slack, email, SMS                         |
 
+## Run
+
+Each server is hosted over Streamable HTTP at `POST /mcp`, with `GET /healthz`.
+
+```bash
+PORT=8080 MCP_TOKEN=secret go run ./servers/crm/cmd/server     # local
+make docker-build SERVER=crm                                   # image → mcp-crm:<git-sha>
+make docker-build-all                                          # all images
+go test ./...                                                  # tests
+```
+
+| Env | Purpose |
+|-----|---------|
+| `PORT` | Listen port (default `8080`) |
+| `MCP_TOKEN` | Required bearer token for `/mcp` (unset = no auth) |
+| `REFUND_APPROVAL_LIMIT_PAISE` | Billing: refunds above this need human approval (default ₹5,000) |
+
+Data is in-memory with sample records until real backends are connected.
+
 ## Example Workflows
 
 **Refund (CS):** request → check order + policy → validate → issue refund → update ticket & notify → escalate only on exception.
